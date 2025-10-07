@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16
+    container_name: iloveshop-postgres
+    environment:
+      POSTGRES_DB: iloveshop
+      POSTGRES_USER: ilja
+      POSTGRES_PASSWORD: 0000
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ilja -d iloveshop"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

@@ -1,10 +1,11 @@
-package com.match.iloveshoping;
+package io.github.digidoggy.app;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ILoveShopingApplicationTests {
+@org.springframework.test.context.ActiveProfiles("test")
+class AppApplicationTests {
 
     @Test
     void contextLoads() {
