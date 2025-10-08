@@ -93,7 +93,7 @@ dev
 
 ```
 👤 Author
-Ilja Aituganov
+Ilja Samalea
 📧 ilja.samalea@gmail.com
 🗓️ Started October 2025
 ```
