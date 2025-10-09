@@ -4,8 +4,8 @@ services:
     container_name: iloveshop-postgres
     environment:
       POSTGRES_DB: iloveshop
-      POSTGRES_USER: ilja
-      POSTGRES_PASSWORD: 0000
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
     ports:
       - "5432:5432"
     volumes:

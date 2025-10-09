@@ -1,14 +1,14 @@
 -- users + auth
 create table users
 (
-    id             uuid primary key,
-    email          varchar(255) unique not null,
-    password_hash  varchar(255)        not null,
-    roles          varchar(255)        not null,
-    phone_country_code   varchar(63)          not null ,
-    phone          varchar(63)         not null,
-    is_2fa_enabled boolean             not null default false,
-    created_at     timestamp           not null default now()
+    id                 uuid primary key,
+    email              varchar(255) unique not null,
+    password_hash      varchar(255)        not null,
+    roles              varchar(255)        not null,
+    phone_country_code varchar(63)         not null,
+    phone              varchar(63) unique  not null,
+    is_2fa_enabled     boolean             not null default false,
+    created_at         timestamp           not null default now()
 );
 
 create table oauth_accounts
