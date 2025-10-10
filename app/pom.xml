@@ -9,6 +9,7 @@
     <artifactId>app</artifactId>
 
     <dependencies>
+
 <!--        Modules-->
         <dependency>
             <groupId>io.github.digidoggy</groupId>
@@ -27,6 +28,11 @@
         </dependency>
 
         <!--Dependency-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.flywaydb</groupId>
