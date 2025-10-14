@@ -1,10 +1,10 @@
-package io.github.digidoggy.app;
+package shop.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(
-        scanBasePackages = "io.github.digidoggy"
+        scanBasePackages = "shop"
 )
 public class AppApplication {
     public static void main(String[] args) {

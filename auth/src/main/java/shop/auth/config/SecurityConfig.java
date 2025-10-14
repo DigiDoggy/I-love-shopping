@@ -1,4 +1,4 @@
-package config;
+package shop.app.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
