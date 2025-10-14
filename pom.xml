@@ -2,13 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
         <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.6</version>
-    </parent>
 
-        <groupId>io.github.digidoggy</groupId>
+        <groupId>shop</groupId>
         <artifactId>i-love-shopping</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <packaging>pom</packaging>
@@ -22,9 +17,9 @@
         </developers>
 
     <modules>
-        <module>common</module>
+<!--        <module>common</module>-->
         <module>auth</module>
-        <module>catalog</module>
+<!--        <module>catalog</module>-->
         <module>app</module>
     </modules>
 
@@ -57,7 +52,7 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <configuration>
-                        <mainClass>io.github.digidoggy.app.AppApplication</mainClass>
+                        <mainClass>shop.app.AppApplication</mainClass>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -70,10 +65,12 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
+                                <version>${version}</version>
                             </path>
                             <path>
                                 <groupId>org.mapstruct</groupId>
                                 <artifactId>mapstruct-processor</artifactId>
+                                <version>${version}</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
