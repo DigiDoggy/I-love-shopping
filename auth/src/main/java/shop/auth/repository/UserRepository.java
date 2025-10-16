@@ -1,6 +1,6 @@
-package shop.app.auth.repository;
+package shop.auth.repository;
 
-import shop.app.auth.model.User;
+import shop.auth.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

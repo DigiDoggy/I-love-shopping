@@ -5,7 +5,7 @@
 
         <groupId>shop</groupId>
         <artifactId>i-love-shopping</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${revision}</version>
         <packaging>pom</packaging>
 
         <developers>
@@ -21,10 +21,17 @@
         <module>auth</module>
 <!--        <module>catalog</module>-->
         <module>app</module>
+        <module>common</module>
     </modules>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <revision>1.0-SNAPSHOT</revision>
+    </properties>
 
     <dependencyManagement>
         <dependencies>
+
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -51,6 +58,7 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>3.5.6</version>
                     <configuration>
                         <mainClass>shop.app.AppApplication</mainClass>
                     </configuration>
@@ -58,6 +66,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.14.0</version>
                     <configuration>
                         <release>21</release>
                         <parameters>true</parameters>
@@ -65,12 +74,12 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
-                                <version>${version}</version>
+                                <version>1.18.40</version>
                             </path>
                             <path>
                                 <groupId>org.mapstruct</groupId>
                                 <artifactId>mapstruct-processor</artifactId>
-                                <version>${version}</version>
+                                <version>1.6.3</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>

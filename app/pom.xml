@@ -3,23 +3,25 @@
     <parent>
         <groupId>shop</groupId>
         <artifactId>i-love-shopping</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
+
+    <groupId>shop.app</groupId>
     <artifactId>app</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>shop.auth</groupId>
+            <artifactId>auth</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 <!--        Modules-->
 <!--        <dependency>-->
 <!--            <groupId>shop</groupId>-->
 <!--            <artifactId>common</artifactId>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>shop</groupId>
-            <artifactId>auth</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>shop</groupId>-->
 <!--            <artifactId>catalog</artifactId>-->
@@ -36,12 +38,12 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>11.7.2</version>
+            <version>11.14.0</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
-            <version>11.7.2</version>
+            <version>11.14.0</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.postgresql</groupId>-->
@@ -49,13 +51,6 @@
 <!--            <scope>runtime</scope>-->
 <!--            <version></version>-->
 <!--        </dependency>-->
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-            <version>2.3.232</version>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -72,6 +67,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
             <version>3.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.232</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

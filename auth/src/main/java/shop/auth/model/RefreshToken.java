@@ -1,4 +1,4 @@
-package shop.app.auth.model;
+package shop.auth.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

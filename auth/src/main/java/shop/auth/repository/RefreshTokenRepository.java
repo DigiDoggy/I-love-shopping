@@ -1,6 +1,6 @@
-package shop.app.auth.repository;
+package shop.auth.repository;
 
-import shop.app.auth.model.RefreshToken;
+import shop.auth.model.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

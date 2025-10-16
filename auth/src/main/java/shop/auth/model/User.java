@@ -1,9 +1,11 @@
-package shop.app.auth.model;
+package shop.auth.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import shop.auth.model.OauthAccount;
+import shop.auth.model.RefreshToken;
 
 import java.time.Instant;
 import java.util.List;
