@@ -1,11 +1,12 @@
 package shop.auth.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import shop.auth.model.OauthAccount;
-import shop.auth.model.RefreshToken;
 
 import java.time.Instant;
 import java.util.List;
@@ -24,6 +25,8 @@ public class User {
     private UUID id;
     @Column(nullable = false,unique = true)
     private String email;
+    @Column(name = "user_name",nullable = false)
+    private String userName;
     @ToString.Exclude
     @Column(name= "password_hash",nullable = false)
     private String passwordHash;
