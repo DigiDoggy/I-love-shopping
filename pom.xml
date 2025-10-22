@@ -20,7 +20,7 @@
 <!--        <module>common</module>-->
         <module>auth</module>
 <!--        <module>catalog</module>-->
-        <module>app</module>
+<!--        <module>app</module>-->
         <module>common</module>
     </modules>
     <properties>
@@ -60,7 +60,7 @@
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>3.5.6</version>
                     <configuration>
-                        <mainClass>shop.app.AppApplication</mainClass>
+                        <mainClass>shop.AppApplication</mainClass>
                     </configuration>
                 </plugin>
                 <plugin>

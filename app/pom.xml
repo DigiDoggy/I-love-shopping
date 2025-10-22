@@ -6,7 +6,7 @@
         <version>${revision}</version>
     </parent>
 
-    <groupId>shop.app</groupId>
+    <groupId>shop</groupId>
     <artifactId>app</artifactId>
     <packaging>jar</packaging>
 
@@ -101,7 +101,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>
-                        shop.app.AppApplication
+                        shop.AppApplication
                     </mainClass>
                 </configuration>
             </plugin>
