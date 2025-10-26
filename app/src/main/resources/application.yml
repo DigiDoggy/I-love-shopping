@@ -7,7 +7,7 @@ spring:
     hibernate:
       ddl-auto: validate
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
     baseline-on-migrate: false
 
@@ -19,3 +19,6 @@ management:
   endpoint:
     health:
       show-details: always
+
+  jwt:
+    refreshExpirationMs: 604800000
