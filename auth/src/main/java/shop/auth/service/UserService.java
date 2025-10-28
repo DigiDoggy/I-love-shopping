@@ -1,18 +1,16 @@
 package shop.auth.service;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.stereotype.Service;
 import shop.auth.model.User;
 import shop.auth.repository.UserRepository;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,12 +31,16 @@ public class UserService {
 
     public String verify(User user) {
         Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPasswordHash()));
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPasswordHash()));
        if( authentication.isAuthenticated()){
-           return jwtService.generateToken();
+           return jwtService.generateToken(user.getEmail());
        }
 
        return "fail";
 
+    }
+
+    public List<User> getUsers() {
+        return userRepository.findAll();
     }
 }

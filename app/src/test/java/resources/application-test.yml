@@ -16,3 +16,6 @@ spring:
       mode: never
 
   debug: true
+
+jwt:
+  refreshExpirationMs: 604800000

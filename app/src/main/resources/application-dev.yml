@@ -25,5 +25,8 @@ logging:
     org.flywaydb: DEBUG
     org.springframework.boot.autoconfigure.flyway: DEBUG
 
-  jwt:
-    refreshExpirationMs: 604800000
+jwt:
+  refreshExpirationMs: 604800000
+
+
+

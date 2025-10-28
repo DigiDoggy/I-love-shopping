@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import shop.auth.repository.RefreshTokenRepository;
+import shop.auth.service.JWTService;
 import shop.auth.service.RefreshTokenService;
 
 import java.util.Map;
@@ -16,6 +17,7 @@ public class AuthController {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenService refreshTokenService;
+    private final JWTService jwtService;
 
 
     @PostMapping("/refresh")
@@ -29,7 +31,7 @@ public class AuthController {
                         return ResponseEntity.badRequest().body("Refresh token expired. Please login again.");
                     }
 
-                    String newJwt = jwtUtils.generateToken(token.getUser().getEmail());
+                    String newJwt = jwtService.generateToken(token.getUser().getEmail());
                     return ResponseEntity.ok(Map.of("token", newJwt));
                 })
                 .orElse(ResponseEntity.badRequest().body("Invalid refresh token"));
