@@ -11,7 +11,7 @@ import shop.auth.service.UserService;
 
 import java.util.List;
 
-@Slf4j
+
 @RestController
 public class UserController {
     @Autowired

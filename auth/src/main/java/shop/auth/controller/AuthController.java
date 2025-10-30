@@ -1,10 +1,13 @@
 package shop.auth.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import shop.auth.repository.RefreshTokenRepository;
 import shop.auth.service.JWTService;
 import shop.auth.service.RefreshTokenService;
@@ -37,6 +40,7 @@ public class AuthController {
                 .orElse(ResponseEntity.badRequest().body("Invalid refresh token"));
     }
 
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody Map<String, String> payload){
         String requestToken = payload.get("refreshToken");
@@ -51,4 +55,11 @@ public class AuthController {
                 })
                 .orElse(ResponseEntity.badRequest().body("Invalid refresh token"));
     }
+
+    @GetMapping("/")
+    @ResponseBody
+    public String greateIndex(){
+        return "Hello World from oa2Auth";
+    }
+
 }

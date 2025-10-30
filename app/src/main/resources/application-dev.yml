@@ -10,6 +10,20 @@ spring:
     enabled: false
     locations: classpath:db/migration
     baseline-on-migrate: false
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 777319325568-5e5ps42822bqbmqvf4jmaj846pti2fpj.apps.googleusercontent.com
+            client-secret: ***REMOVED***
+            scope: openid, profile, email
+            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+#    debug: true
+  output:
+    ansi:
+      enabled: always
+
 
 management:
   endpoints:
@@ -22,8 +36,11 @@ management:
 
 logging:
   level:
-    org.flywaydb: DEBUG
-    org.springframework.boot.autoconfigure.flyway: DEBUG
+    org.springframework.security: WARN
+    org.springframework.security.web.FilterChainProxy: ERROR
+    org.springframework.security.web.session: ERROR
+    org.springframework.security.oauth2: WARN
+    org.springframework.web.servlet.DispatcherServlet: WARN
 
 jwt:
   refreshExpirationMs: 604800000

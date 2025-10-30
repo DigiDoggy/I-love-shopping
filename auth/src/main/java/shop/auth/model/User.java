@@ -40,6 +40,8 @@ public class User {
     private boolean twoFaEnabled;
     @Column(name = "created_at", nullable = false)
     private Instant createdAt= Instant.now();
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified=false;
 
     @OneToMany(mappedBy = "user")
     private List<OauthAccount> oauthAccounts;
