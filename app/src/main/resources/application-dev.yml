@@ -3,6 +3,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/iloveshop
     username: admin
     password: 1234
+    profiles:
+      active: dev
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,7 +21,12 @@ spring:
             client-secret: ***REMOVED***
             scope: openid, profile, email
             redirect-uri: "http://localhost:8080/login/oauth2/code/google"
-#    debug: true
+          github:
+            client-id: Ov23lihVOtbA6rXHMfas
+            client-secret: ***REMOVED***
+            scope: read:user, user:email
+            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
+    debug: true
   output:
     ansi:
       enabled: always

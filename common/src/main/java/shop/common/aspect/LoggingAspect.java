@@ -4,10 +4,8 @@ package shop.common.aspect;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -16,6 +14,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 //todo need refactoring. Mb need create separate aspects for controller and service (need divide some methods)
+// create file for logging
+
+//todo guide for logging with other services ( https://www.youtube.com/watch?v=R_apT6h_MnE )
 
 @Component
 @Aspect
@@ -75,5 +76,26 @@ public class LoggingAspect {
         } else {
             log.info("RETURNED OBJECT:\n{}", returnObject);
         }
+    }
+
+    // Some training
+    @Around("controllerLogging()")
+    public Object doAroundLogController(ProceedingJoinPoint joinPoint) throws Throwable {
+        long startTime = System.currentTimeMillis();
+        Object result = joinPoint.proceed();
+        long endTime = System.currentTimeMillis();
+        log.info("TIME SPENT IN CONTROLLER: {}.{} in {} ms",
+                joinPoint.getSignature().getDeclaringTypeName(),
+                joinPoint.getSignature().getName(),
+                endTime - startTime);
+        return result;
+    }
+
+    @AfterThrowing(throwing = "ex", pointcut = "controllerLogging()")
+    public void doAfterThrowingLogController(JoinPoint joinPoint, Exception ex) {
+        String methodName = joinPoint.getSignature().getName();
+        String className = joinPoint.getSignature().getDeclaringTypeName();
+        log.error("ERROR IN CONTROLLER: {}.{} whet argument {}. WITH EXCEPTION: {}",
+                className, methodName, Arrays.toString(joinPoint.getArgs()), ex.getMessage());
     }
 }
