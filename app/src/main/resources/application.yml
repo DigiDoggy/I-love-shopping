@@ -5,7 +5,7 @@ spring:
     password: 1234
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
   flyway:
     enabled: false
     locations: classpath:db/migration
@@ -18,6 +18,11 @@ spring:
             client-id: 777319325568-5e5ps42822bqbmqvf4jmaj846pti2fpj.apps.googleusercontent.com
             client-secret: ***REMOVED***
             scope: openid, profile, email
+            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
+          github:
+            client-id: Ov23lihVOtbA6rXHMfas
+            client-secret: ***REMOVED***
+            scope: read:user, user:email
             redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
 
 

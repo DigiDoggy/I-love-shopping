@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name= "users")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,25 +23,25 @@ public class User {
     @GeneratedValue
     @JdbcTypeCode(SqlTypes.UUID)
     private UUID id;
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
-    @Column(name = "user_name",nullable = false)
+    @Column(name = "user_name", nullable = false)
     private String userName;
     @ToString.Exclude
-    @Column(name= "password_hash",nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
-    @Column(name="phone_country_code", nullable = false)
+    @Column(name = "phone_country_code", nullable = false)
     private String phoneCountryCode;
-    @Column(name ="phone_number", nullable = false, unique = true)
+    @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
     @Column(nullable = false)
     private String roles;
-    @Column(name="is_2fa_enabled")
+    @Column(name = "is_2fa_enabled")
     private boolean twoFaEnabled;
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt= Instant.now();
+    private Instant createdAt = Instant.now();
     @Column(name = "email_verified", nullable = false)
-    private boolean emailVerified=false;
+    private boolean emailVerified = false;
 
     @OneToMany(mappedBy = "user")
     private List<OauthAccount> oauthAccounts;

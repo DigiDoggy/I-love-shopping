@@ -20,12 +20,14 @@ import java.util.Collection;
 @Component
 @Aspect
 @Slf4j
-public class  LoggingAspect {
+public class LoggingAspect {
     @Pointcut("execution (public * shop.auth.controller.*.*(..))")
-    public void controllerLogging() {}
+    public void controllerLogging() {
+    }
 
     @Pointcut("execution (public * shop.auth.service.*.*(..))")
-    public void serviceLogging() {}
+    public void serviceLogging() {
+    }
 
     @Before("controllerLogging()")
     public void doBeforeLogController(JoinPoint joinPoint) {
@@ -41,7 +43,7 @@ public class  LoggingAspect {
                     request.getMethod(),
                     joinPoint.getSignature().getDeclaringTypeName(),
                     joinPoint.getSignature().getName());
-        }else{
+        } else {
             log.info("️NEW REQUEST (no HttpServletRequest): {}.{}()",
                     joinPoint.getSignature().getDeclaringTypeName(),
                     joinPoint.getSignature().getName());
@@ -70,7 +72,7 @@ public class  LoggingAspect {
             for (Object item : collection) {
                 log.info("RETURNED ITEM: {}", item);
             }
-        }else{
+        } else {
             log.info("RETURNED OBJECT:\n{}", returnObject);
         }
     }
