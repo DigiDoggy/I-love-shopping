@@ -1,6 +1,7 @@
 package shop.auth.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import shop.auth.config.JwtProperties;
 import shop.auth.model.RefreshToken;
@@ -10,6 +11,7 @@ import shop.auth.repository.UserRepository;
 import java.time.Instant;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class RefreshTokenService {
@@ -20,8 +22,11 @@ public class RefreshTokenService {
     public RefreshToken createRefreshToken(UUID userId){
         var token = new RefreshToken();
         token.setUser(userRepository.findById(userId).orElseThrow());
+
         token.setIssuedAt(Instant.now());
         token.setExpiresAt(token.getIssuedAt().plusMillis(jwtProperties.getRefreshExpirationMs()));
+        token.setTokenHash(UUID.randomUUID().toString());
+        log.info("Created refresh token for user: {}", token.getUser().getEmail());
         return refreshTokenRepository.save(token);
     }
 

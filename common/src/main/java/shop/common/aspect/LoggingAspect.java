@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 //todo need refactoring. Mb need create separate aspects for controller and service (need divide some methods)
-// create file for logging
 
 //todo guide for logging with other services ( https://www.youtube.com/watch?v=R_apT6h_MnE )
 

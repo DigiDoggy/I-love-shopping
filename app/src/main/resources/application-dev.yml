@@ -16,6 +16,7 @@ spring:
     oauth2:
       client:
         registration:
+#todo need understand how secure client secrets
           google:
             client-id: 777319325568-5e5ps42822bqbmqvf4jmaj846pti2fpj.apps.googleusercontent.com
             client-secret: ***REMOVED***

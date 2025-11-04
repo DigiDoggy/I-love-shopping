@@ -46,5 +46,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<OauthAccount> oauthAccounts;
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<RefreshToken> refreshTokens;
 }

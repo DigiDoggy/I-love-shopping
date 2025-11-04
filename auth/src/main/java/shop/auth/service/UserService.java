@@ -2,11 +2,16 @@ package shop.auth.service;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import shop.auth.dto.AuthDTO;
+import shop.auth.dto.UserDTO;
+import shop.auth.mapper.UserMapper;
+import shop.auth.model.RefreshToken;
 import shop.auth.model.User;
 import shop.auth.repository.UserRepository;
 
@@ -19,6 +24,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
+    private final RefreshTokenService refreshTokenService;
+    @Autowired
+    private UserMapper userMapper;
 
     private BCryptPasswordEncoder bCrypPasswordEncoder = new BCryptPasswordEncoder(12);
 
@@ -29,18 +37,25 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String verify(User user) {
+    public AuthResult login(AuthDTO request) {
         Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPasswordHash()));
-       if( authentication.isAuthenticated()){
-           return jwtService.generateToken(user.getEmail());
-       }
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
-       return "fail";
+        User user = userRepository.findByEmail(request.email()).orElseThrow();
+        String accessToken= jwtService.generateToken(user.getEmail());
+        RefreshToken refresh = refreshTokenService.createRefreshToken(user.getId());
 
+        return new AuthResult(accessToken, refresh.getTokenHash());
     }
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
+
+    public List<UserDTO> getUsers() {
+
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toDTO)
+                .toList();
     }
+
+    public record AuthResult( String accessToken, String refreshToken){}
 }
