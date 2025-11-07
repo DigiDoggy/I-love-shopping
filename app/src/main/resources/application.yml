@@ -35,5 +35,9 @@ management:
     health:
       show-details: always
 
-  jwt:
-    refreshExpirationMs: 604800000
+jwt:
+  secret: ${JWT_TOKEN_SECRET}
+  access:
+    duration: ${JWT_ACCESS_TOKEN_DURATION_SECONDS}
+  refresh:
+    duration: ${JWT_REFRESH_TOKEN_DURATION_SECONDS}

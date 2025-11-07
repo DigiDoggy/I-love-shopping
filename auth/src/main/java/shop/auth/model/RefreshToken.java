@@ -25,6 +25,7 @@ public class RefreshToken {
     @ToString.Exclude
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
+    //token info
     @Column(name = "token_hash", nullable = false)
     private String tokenHash;
 
