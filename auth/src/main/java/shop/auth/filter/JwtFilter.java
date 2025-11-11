@@ -17,7 +17,6 @@ import shop.auth.service.shopUserDetailsService;
 
 import java.io.IOException;
 
-// todo Need logging
 
 @RequiredArgsConstructor
 @Component
@@ -30,10 +29,15 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        if (path.startsWith("/oauth2/") || path.startsWith("/login/oauth2/")
-                || path.equals("/login") || path.equals("/error")) {
+        if (path.startsWith("/oauth2/")
+                || path.startsWith("/login/oauth2/")
+                || path.equals("/login")
+                || path.equals("/error")
+                || path.equals("/api/auth/register")
+                || path.equals("/api/auth/refresh")
+                || path.startsWith("/actuator/")) {
             filterChain.doFilter(request, response);
-            return ;
+            return;
         }
 
         String authHeader = request.getHeader("Authorization");
@@ -54,9 +58,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-            ;
         }
         filterChain.doFilter(request, response);
 
     }
+
 }
