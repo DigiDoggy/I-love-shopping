@@ -38,5 +38,5 @@ build/
 /docs/roadmap.md
 MyHelperController.md
 
-/logback
+logback
 app/logback

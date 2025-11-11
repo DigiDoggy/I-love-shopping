@@ -23,5 +23,4 @@ public class UserController {
         System.out.println("UserController.getUsers");
         return userService.getUsers();
     }
-//    @GetMapping("/me")
 }

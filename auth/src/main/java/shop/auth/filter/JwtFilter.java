@@ -6,14 +6,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import shop.auth.exception.AppException;
 import shop.auth.service.JWTService;
 import shop.auth.service.shopUserDetailsService;
+import shop.auth.util.CookieUtils;
 
 import java.io.IOException;
 
@@ -40,27 +43,38 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        String email = null;
+        String token = resolveToken(request);
+        if (token !=null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            String email= null;
+            try {
+                email = jwtService.extractUserEmail(token);
+            } catch (Exception e) {
+                // we do not authenticate
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            email = jwtService.extractUserEmail(token);
-        }
+            if (email != null) {
+                UserDetails userDetails = applicationContext.getBean(shopUserDetailsService.class).loadUserByUsername(email);
+                if (jwtService.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = applicationContext.getBean(shopUserDetailsService.class).loadUserByUsername(email);
-            if (jwtService.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
         }
         filterChain.doFilter(request, response);
+    }
 
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        String cookieToken = CookieUtils.getCookieValue(request, "accessToken");
+        return (cookieToken == null || cookieToken.isBlank()) ? null : cookieToken;
     }
 
 }

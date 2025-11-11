@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import shop.auth.dto.AuthDTO;
 import shop.auth.dto.UserDTO;
 import shop.auth.mapper.UserMapper;
-import shop.auth.model.RefreshToken;
 import shop.auth.model.User;
 import shop.auth.repository.UserRepository;
 
@@ -50,6 +49,8 @@ public class UserService {
 
 
     public List<UserDTO> getUsers() {
+
+        System.out.println("Searching people");
 
         return userRepository.findAll()
                 .stream()
