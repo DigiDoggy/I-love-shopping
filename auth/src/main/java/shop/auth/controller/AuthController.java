@@ -1,15 +1,16 @@
 package shop.auth.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import shop.auth.dto.AuthDTO;
 import shop.auth.dto.LoginResponse;
+import shop.auth.dto.UserDTO;
 import shop.auth.model.User;
 import shop.auth.service.AuthService;
 import shop.auth.service.CaptchaService;
@@ -20,6 +21,7 @@ import shop.auth.util.CookieUtils;
 import java.util.Map;
 
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -39,11 +41,11 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(
             @CookieValue(name = "refreshToken", required = true) String token,
-            HttpServletResponse resp){
+            HttpServletResponse resp) {
 
-         Map<String, String> tokens = authService.refresh(token);
+        Map<String, String> tokens = authService.refresh(token);
 
-        CookieUtils.addCookie(resp, "accessToken",  tokens.get("accessToken"),  accessTokenDuration);
+        CookieUtils.addCookie(resp, "accessToken", tokens.get("accessToken"), accessTokenDuration);
         CookieUtils.addCookie(resp, "refreshToken", tokens.get("refreshToken"), refreshDuration);
 
 
@@ -54,9 +56,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @RequestBody AuthDTO request,
-            HttpServletResponse resp){
+            HttpServletResponse resp) {
 
-        UserService.AuthResult result= userService.login(request);
+        UserService.AuthResult result = userService.login(request);
 
         CookieUtils.addCookie(resp, "refreshToken", result.refreshToken(), refreshDuration);
         CookieUtils.addCookie(resp, "accessToken", result.accessToken(), accessTokenDuration);
@@ -65,16 +67,14 @@ public class AuthController {
     }
 
 
+    //todo need try
     @PostMapping("/register")
-    public User register(@RequestBody @Valid User user,
-                         HttpServletRequest request ){
+    public User register(@RequestBody @Valid RegisterRequest request) {
+        captchaService.processResponse(request.response, CaptchaService.REGISTRATION_ACTION);
+        log.info("reCAPTCHA response:{} " ,request.response );
+        return userService.register(request.user);
 
-        String response = request.getParameter("response");
-        captchaService.processResponse(response, CaptchaService.REGISTRATION_ACTION);
-        return userService.register(user);
     }
-
-
 
     @PostMapping("/logout")
     public ResponseEntity<LoginResponse> logout(
@@ -82,7 +82,7 @@ public class AuthController {
             @CookieValue(name = "accessToken", required = false) String accessToken,
             HttpServletResponse resp) {
 
-        ResponseEntity<LoginResponse> responseEntity= authService.logout(refreshToken, accessToken);
+        ResponseEntity<LoginResponse> responseEntity = authService.logout(refreshToken, accessToken);
 
         //For clearing cookies in browser
         CookieUtils.deleteCookie(resp, "accessToken");
@@ -93,8 +93,21 @@ public class AuthController {
 
     @GetMapping("/")
     @ResponseBody
-    public String createIndex(){
+    public String createIndex() {
         return "Hello World from oa2Auth";
+    }
+
+    // for distributing requests (otherwise further req ==null)
+    public record RegisterRequest(UserDTO user, String response, String action) {
+    }
+//test reCAptcha
+    @PostMapping("/recaptcha/verify")
+    public ResponseEntity<?> verifyRecaptcha(@RequestBody Map<String,String> body) {
+        String token = body.get("response");
+        String action = body.getOrDefault("action", CaptchaService.REGISTRATION_ACTION);
+        captchaService.processResponse(token, action);
+        log.info("reCAPTCHA response:{} " ,token );
+        return ResponseEntity.ok(Map.of("message", "ok"));
     }
 
 }

@@ -3,6 +3,7 @@ package shop.auth.service;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import shop.auth.dto.AuthDTO;
 import shop.auth.dto.UserDTO;
+import shop.auth.exception.AppException;
 import shop.auth.mapper.UserMapper;
 import shop.auth.model.User;
 import shop.auth.repository.UserRepository;
@@ -30,9 +32,16 @@ public class UserService {
     private BCryptPasswordEncoder bCrypPasswordEncoder = new BCryptPasswordEncoder(12);
 
     //todo need implement request validation
-    public User register(@NotNull User user){
+    public User register(@NotNull UserDTO userDTO){
+
+        if (userRepository.existsByEmailIgnoreCase(userDTO.email())) {
+            throw new AppException(HttpStatus.CONFLICT, "Email already in use");
+        }
+
         //here we need use request validation, instead of hashPassword request password
-        user.setPasswordHash(bCrypPasswordEncoder.encode(user.getPasswordHash()));
+        User user = userMapper.registerRequest(userDTO);
+        user.setPasswordHash(bCrypPasswordEncoder.encode(userDTO.password()));
+        user.setEmail(user.getEmail().toLowerCase());
         return userRepository.save(user);
     }
 

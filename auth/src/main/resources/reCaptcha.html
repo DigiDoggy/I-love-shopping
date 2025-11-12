@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>reCAPTCHA v3 Token Test</title>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfG_wksAAAAAAxIvH0CJ6WGuK8EkT8-p4TGO_Ni"></script>
+</head>
+<body>
+<h2>🔒 reCAPTCHA v3 Test Page</h2>
+<p>Press to generate token:</p>
+<button id="generate">Get reCAPTCHA Token</button>
+
+<p>Токен (response):</p>
+<textarea id="output" cols="100" rows="5" readonly></textarea>
+
+<script>
+    const siteKey = "6LfG_wksAAAAAAxIvH0CJ6WGuK8EkT8-p4TGO_Ni";
+
+    document.getElementById("generate").addEventListener("click", () => {
+        grecaptcha.ready(function() {
+            grecaptcha.execute(siteKey, { action: 'register' }).then(function(token) {
+                console.log("Generated token:", token);
+                document.getElementById("output").value = token;
+                alert("Token generated successfully!");
+            });
+        });
+    });
+</script>
+</body>
+</html>

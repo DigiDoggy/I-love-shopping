@@ -15,14 +15,19 @@ import shop.auth.exception.InvalidReCaptchaException;
 import java.net.URI;
 import java.util.regex.Pattern;
 
-@RequiredArgsConstructor
 @Service
 public class CaptchaService implements ICaptchaService {
     private final CaptchaSettings captchaSettings;
-
-    private RestOperations restTemplate;
-
+    private final RestOperations restTemplate;
     private final ReCaptchaAttemptService reCaptchaAttemptService;
+
+    public CaptchaService(CaptchaSettings captchaSettings,
+                          RestOperations restTemplate,
+                          ReCaptchaAttemptService reCaptchaAttemptService) {
+        this.captchaSettings = captchaSettings;
+        this.restTemplate = restTemplate;
+        this.reCaptchaAttemptService = reCaptchaAttemptService;
+    }
 
     public static String REGISTRATION_ACTION= "register";
 

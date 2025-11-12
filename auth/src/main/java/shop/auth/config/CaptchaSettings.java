@@ -18,10 +18,4 @@ public class CaptchaSettings {
     private String secret;
     private float threshold;
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-
 }
