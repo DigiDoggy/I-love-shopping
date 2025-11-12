@@ -1,6 +1,8 @@
 package shop.auth.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,8 @@ import shop.auth.dto.AuthDTO;
 import shop.auth.dto.LoginResponse;
 import shop.auth.model.User;
 import shop.auth.service.AuthService;
+import shop.auth.service.CaptchaService;
+import shop.auth.service.ICaptchaService;
 import shop.auth.service.UserService;
 import shop.auth.util.CookieUtils;
 
@@ -29,6 +33,7 @@ public class AuthController {
 
     private final UserService userService;
     private final AuthService authService;
+    private final ICaptchaService captchaService;
 
 
     @PostMapping("/refresh")
@@ -61,7 +66,11 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public User register(@RequestBody User user){
+    public User register(@RequestBody @Valid User user,
+                         HttpServletRequest request ){
+
+        String response = request.getParameter("response");
+        captchaService.processResponse(response, CaptchaService.REGISTRATION_ACTION);
         return userService.register(user);
     }
 

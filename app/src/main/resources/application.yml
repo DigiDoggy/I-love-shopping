@@ -43,3 +43,10 @@ jwt:
     duration: ${JWT_ACCESS_TOKEN_DURATION_SECONDS}
   refresh:
     duration: ${JWT_REFRESH_TOKEN_DURATION_SECONDS}
+
+google:
+  recaptcha:
+    key:
+      site: ${FRONTEND_RECAPTCHA_SITE_KEY}
+      secret: ${RECAPTCHA_SECRET_KEY}
+      threshold: 0.5
