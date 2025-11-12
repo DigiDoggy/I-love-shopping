@@ -1,4 +1,4 @@
-package shop.auth.service;
+package shop.auth.service.reCaptcha;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

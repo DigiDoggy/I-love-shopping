@@ -1,22 +1,30 @@
 package shop.auth.service;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.auth.config.OAuth2SuccessHandler;
+import shop.auth.dto.AuthDTO;
 import shop.auth.dto.LoginResponse;
+import shop.auth.dto.UserDTO;
 import shop.auth.exception.AppException;
 import shop.auth.exception.ResourceNotFoundException;
+import shop.auth.mapper.UserMapper;
 import shop.auth.model.RefreshToken;
 import shop.auth.model.User;
 import shop.auth.repository.RefreshTokenRepository;
 import shop.auth.repository.UserRepository;
+import shop.auth.service.reCaptcha.CaptchaService;
 
 import java.time.Instant;
 import java.util.List;
@@ -33,8 +41,36 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JWTService jWTService;
+    private final UserMapper userMapper;
+    private final JWTService jwtService;
 
 
+    private BCryptPasswordEncoder bCrypPasswordEncoder = new BCryptPasswordEncoder(12);
+
+    //todo need implement request validation
+    public User register(@NotNull UserDTO userDTO){
+
+        if (userRepository.existsByEmailIgnoreCase(userDTO.email())) {
+            throw new AppException(HttpStatus.CONFLICT, "Email already in use");
+        }
+
+        //here we need use request validation, instead of hashPassword request password
+        User user = userMapper.registerRequest(userDTO);
+        user.setPasswordHash(bCrypPasswordEncoder.encode(userDTO.password()));
+        user.setEmail(user.getEmail().toLowerCase());
+        return userRepository.save(user);
+    }
+
+    public UserService.AuthResult login(AuthDTO request) {
+        Authentication authentication =
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+
+        User user = userRepository.findByEmail(request.email()).orElseThrow();
+        String accessToken= jwtService.generateToken(user.getEmail());
+        String refresh = refreshTokenService.createRefreshToken(user.getId());
+
+        return new UserService.AuthResult(accessToken, refresh);
+    }
 
     @Transactional
     public Map<String, String> refresh(String refreshToken) {
@@ -65,38 +101,21 @@ public class AuthService {
         );
     }
 
-    public ResponseEntity<LoginResponse> logout(String refreshToken, String accessToken) {
+    public boolean logout(String refreshToken, String authorizationHeader) {
         SecurityContextHolder.clearContext();
 
-        String email= jWTService.extractUserEmail(accessToken);
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return false;
+        }
 
-        User user = userRepository.findByEmail(email).orElseThrow(
-                ()->new ResourceNotFoundException("User not found.")
-        );
+        String accessToken = authorizationHeader.substring(7).trim();
+        String email = jWTService.extractUserEmail(accessToken);
 
-        //deleting tokens
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+
         revokeTokensOfUser(user);
-
-        HttpHeaders responseHeaders = new HttpHeaders();
-
-        responseHeaders.add(HttpHeaders.SET_COOKIE, ResponseCookie
-                .from("refreshToken", "")
-                .maxAge(0)
-                .httpOnly(true)
-                .path("/api/auth")
-                .build()
-                .toString());
-
-        responseHeaders.add(HttpHeaders.SET_COOKIE, ResponseCookie
-                .from("accessToken", "")
-                .maxAge(0)
-                .httpOnly(true)
-                .path("/")
-                .build()
-                .toString());
-        LoginResponse loginResponse = new LoginResponse(false);
-
-        return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
+        return true;
 
     }
 

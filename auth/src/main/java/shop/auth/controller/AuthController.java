@@ -6,23 +6,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import shop.auth.dto.AuthDTO;
 import shop.auth.dto.LoginResponse;
 import shop.auth.dto.UserDTO;
 import shop.auth.model.User;
 import shop.auth.service.AuthService;
-import shop.auth.service.CaptchaService;
-import shop.auth.service.ICaptchaService;
 import shop.auth.service.UserService;
+import shop.auth.service.reCaptcha.CaptchaService;
+import shop.auth.service.reCaptcha.ICaptchaService;
 import shop.auth.util.CookieUtils;
 
 import java.util.Map;
 
 
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -32,24 +31,22 @@ public class AuthController {
     @Value("${jwt.access.duration}")
     private long accessTokenDuration;
 
-
-    private final UserService userService;
     private final AuthService authService;
     private final ICaptchaService captchaService;
 
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(
-            @CookieValue(name = "refreshToken", required = true) String token,
+            @CookieValue(name = "refreshToken", required = false) String token,
             HttpServletResponse resp) {
 
         Map<String, String> tokens = authService.refresh(token);
 
-        CookieUtils.addCookie(resp, "accessToken", tokens.get("accessToken"), accessTokenDuration);
+        //        CookieUtils.addCookie(resp, "accessToken", tokens.get("accessToken"), accessTokenDuration);
         CookieUtils.addCookie(resp, "refreshToken", tokens.get("refreshToken"), refreshDuration);
 
 
-        return ResponseEntity.ok().body(new LoginResponse(true));
+        return ResponseEntity.ok().body(new LoginResponse(true, tokens.get("accessToken"), accessTokenDuration));
 
     }
 
@@ -58,37 +55,37 @@ public class AuthController {
             @RequestBody AuthDTO request,
             HttpServletResponse resp) {
 
-        UserService.AuthResult result = userService.login(request);
+        UserService.AuthResult result = authService.login(request);
 
         CookieUtils.addCookie(resp, "refreshToken", result.refreshToken(), refreshDuration);
-        CookieUtils.addCookie(resp, "accessToken", result.accessToken(), accessTokenDuration);
+        //        CookieUtils.addCookie(resp, "accessToken", result.accessToken(), accessTokenDuration);
 
-        return ResponseEntity.ok(new LoginResponse(true));
+
+        return ResponseEntity.ok(new LoginResponse(true, result.accessToken(), accessTokenDuration));
     }
 
 
-    //todo need try
     @PostMapping("/register")
-    public User register(@RequestBody @Valid RegisterRequest request) {
+    public User register(@Valid RegisterRequest request) {
         captchaService.processResponse(request.response, CaptchaService.REGISTRATION_ACTION);
-        log.info("reCAPTCHA response:{} " ,request.response );
-        return userService.register(request.user);
+        return authService.register(request.user);
 
     }
 
     @PostMapping("/logout")
     public ResponseEntity<LoginResponse> logout(
             @CookieValue(name = "refreshToken", required = false) String refreshToken,
-            @CookieValue(name = "accessToken", required = false) String accessToken,
+            @RequestHeader(name = "Authorization", required = false) String authorizationHeader,
             HttpServletResponse resp) {
 
-        ResponseEntity<LoginResponse> responseEntity = authService.logout(refreshToken, accessToken);
+        boolean success = authService.logout(refreshToken, authorizationHeader);
 
         //For clearing cookies in browser
-        CookieUtils.deleteCookie(resp, "accessToken");
+        //        CookieUtils.deleteCookie(resp, "accessToken");
         CookieUtils.deleteCookie(resp, "refreshToken");
 
-        return responseEntity;
+        return ResponseEntity.ok(new LoginResponse(success, null, null));
+
     }
 
     @GetMapping("/")
@@ -100,13 +97,13 @@ public class AuthController {
     // for distributing requests (otherwise further req ==null)
     public record RegisterRequest(UserDTO user, String response, String action) {
     }
-//test reCAptcha
+
+    //test reCAptcha
     @PostMapping("/recaptcha/verify")
-    public ResponseEntity<?> verifyRecaptcha(@RequestBody Map<String,String> body) {
+    public ResponseEntity<?> verifyRecaptcha(@RequestBody Map<String, String> body) {
         String token = body.get("response");
         String action = body.getOrDefault("action", CaptchaService.REGISTRATION_ACTION);
         captchaService.processResponse(token, action);
-        log.info("reCAPTCHA response:{} " ,token );
         return ResponseEntity.ok(Map.of("message", "ok"));
     }
 
