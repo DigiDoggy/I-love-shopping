@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.jboss.aerogear.security.otp.api.Base32;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
@@ -41,11 +42,16 @@ public class User{
     private String roles;
     @Column(name = "is_2fa_enabled")
     private boolean twoFaEnabled;
+    @Column(name="2_fa_secret")
+    private String twoFaSecret;
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified = false;
 
+    private String generateTwoFaSecret(){
+        return Base32.random();
+    }
     //todo create fields earlier
     // and rewrite then UserPrincipal
 
