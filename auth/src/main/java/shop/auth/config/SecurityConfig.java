@@ -46,12 +46,16 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/api/auth/recaptcha/verify").permitAll()
+                        .requestMatchers("/api/verify-totp").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(o -> o.disable()
 //                        .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
 //                        .successHandler(oAuth2SuccessHandler)
+
                 )
+
+
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

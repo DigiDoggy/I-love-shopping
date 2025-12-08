@@ -5,16 +5,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import shop.auth.dto.AuthDTO;
-import shop.auth.dto.LoginResponse;
-import shop.auth.dto.UserDTO;
+import shop.auth.dto.*;
 import shop.auth.model.User;
 import shop.auth.service.AuthService;
 import shop.auth.service.UserService;
 import shop.auth.service.reCaptcha.CaptchaService;
 import shop.auth.service.reCaptcha.ICaptchaService;
+import shop.auth.service.twoFa.TotpVerificationService;
 import shop.auth.util.CookieUtils;
 
 import java.util.Map;
@@ -33,6 +33,8 @@ public class AuthController {
 
     private final AuthService authService;
     private final ICaptchaService captchaService;
+    private final TotpVerificationService totpVerificationService;
+
 
 
     @PostMapping("/refresh")
@@ -46,9 +48,9 @@ public class AuthController {
         CookieUtils.addCookie(resp, "refreshToken", tokens.get("refreshToken"), refreshDuration);
 
 
-        return ResponseEntity.ok().body(new LoginResponse(true, tokens.get("accessToken"), accessTokenDuration));
-
+        return ResponseEntity.ok().body(new AuthRefresh(tokens.get("accessToken"), accessTokenDuration));
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
@@ -57,23 +59,29 @@ public class AuthController {
 
         UserService.AuthResult result = authService.login(request);
 
+        if(result.accessToken()==null && result.totp()==null){
+            return ResponseEntity.badRequest().body(new LoginResponse(false, null, null,null ));
+        } else if(result.totp()!=null){
+            return ResponseEntity.ok(new LoginResponse(true, null, null, result.totp()));
+        }
+
         CookieUtils.addCookie(resp, "refreshToken", result.refreshToken(), refreshDuration);
         //        CookieUtils.addCookie(resp, "accessToken", result.accessToken(), accessTokenDuration);
 
 
-        return ResponseEntity.ok(new LoginResponse(true, result.accessToken(), accessTokenDuration));
+        return ResponseEntity.ok(new LoginResponse(true, result.accessToken(), accessTokenDuration, null));
     }
 
 
     @PostMapping("/register")
-    public User register(@Valid RegisterRequest request) {
-        captchaService.processResponse(request.response, CaptchaService.REGISTRATION_ACTION);
-        return authService.register(request.user);
+    public User register(@RequestBody UserDTO userDTO) {
+//        captchaService.processResponse(request.response, CaptchaService.REGISTRATION_ACTION);
+        return authService.register(userDTO);
 
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<LoginResponse> logout(
+    public ResponseEntity<?> logout(
             @CookieValue(name = "refreshToken", required = false) String refreshToken,
             @RequestHeader(name = "Authorization", required = false) String authorizationHeader,
             HttpServletResponse resp) {
@@ -84,7 +92,7 @@ public class AuthController {
         //        CookieUtils.deleteCookie(resp, "accessToken");
         CookieUtils.deleteCookie(resp, "refreshToken");
 
-        return ResponseEntity.ok(new LoginResponse(success, null, null));
+        return ResponseEntity.ok(success);
 
     }
 

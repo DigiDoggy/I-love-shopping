@@ -69,3 +69,6 @@ FRONTEND_RECAPTCHA_SITE_KEY: 6LfG_wksAAAAAAxIvH0CJ6WGuK8EkT8-p4TGO_Ni
 #reCapthca for spring boot
 #https://www.baeldung.com/spring-security-registration-captcha#bd-Overview
 
+# 2fa documentation
+# https://github.com/samdjstevens/java-totp/blob/master/README.md#generating-a-qr-code
+

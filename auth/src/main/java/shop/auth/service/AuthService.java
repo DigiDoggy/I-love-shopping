@@ -2,10 +2,7 @@ package shop.auth.service;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.auth.config.OAuth2SuccessHandler;
 import shop.auth.dto.AuthDTO;
-import shop.auth.dto.LoginResponse;
 import shop.auth.dto.UserDTO;
 import shop.auth.exception.AppException;
 import shop.auth.exception.ResourceNotFoundException;
@@ -24,7 +20,7 @@ import shop.auth.model.RefreshToken;
 import shop.auth.model.User;
 import shop.auth.repository.RefreshTokenRepository;
 import shop.auth.repository.UserRepository;
-import shop.auth.service.reCaptcha.CaptchaService;
+import shop.auth.service.twoFa.TotpSetupService;
 
 import java.time.Instant;
 import java.util.List;
@@ -43,6 +39,8 @@ public class AuthService {
     private final JWTService jWTService;
     private final UserMapper userMapper;
     private final JWTService jwtService;
+    private final TotpSetupService totpSetupService;
+
 
 
     private BCryptPasswordEncoder bCrypPasswordEncoder = new BCryptPasswordEncoder(12);
@@ -54,10 +52,14 @@ public class AuthService {
             throw new AppException(HttpStatus.CONFLICT, "Email already in use");
         }
 
-        //here we need use request validation, instead of hashPassword request password
         User user = userMapper.registerRequest(userDTO);
+        String secret = totpSetupService.createSecrete();
+
         user.setPasswordHash(bCrypPasswordEncoder.encode(userDTO.password()));
         user.setEmail(user.getEmail().toLowerCase());
+        user.setTwoFaEnabled(true);
+        user.setTwoFaSecret(secret);
+
         return userRepository.save(user);
     }
 
@@ -66,10 +68,18 @@ public class AuthService {
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
         User user = userRepository.findByEmail(request.email()).orElseThrow();
+
+        // if we have 2fa enabled, return totp
+        if (user.isTwoFaEnabled()){
+            String url =totpSetupService.createQrCode(user.getTwoFaSecret(), user.getEmail());
+            return new UserService.AuthResult(null, null, url);
+        }
+
+        // if not return jwt, refresh token
         String accessToken= jwtService.generateToken(user.getEmail());
         String refresh = refreshTokenService.createRefreshToken(user.getId());
 
-        return new UserService.AuthResult(accessToken, refresh);
+        return new UserService.AuthResult(accessToken, refresh, null);
     }
 
     @Transactional

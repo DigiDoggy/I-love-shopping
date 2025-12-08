@@ -29,5 +29,5 @@ public class UserService {
                 .toList();
     }
 
-    public record AuthResult( String accessToken, String refreshToken){}
+    public record AuthResult( String accessToken, String refreshToken, String totp){}
 }

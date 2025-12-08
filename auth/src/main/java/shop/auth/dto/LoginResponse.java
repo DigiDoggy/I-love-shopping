@@ -4,7 +4,7 @@ public record LoginResponse(
         boolean isLogged,
         String accessToken,
         //duration is needed for token refresh on the frontend
-        Long expiresIn
-        //todo String role;
+        Long expiresIn,
+        String totp
 ) {
 }
