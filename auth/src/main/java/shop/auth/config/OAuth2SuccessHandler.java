@@ -33,7 +33,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         }
 
 
-        String jwt = jwtService.generateToken(email);
+        String jwt = jwtService.generateAccessToken(email);
         response.setHeader("Authorization", "Bearer " + jwt);
         response.sendRedirect("/");
     }

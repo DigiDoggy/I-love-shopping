@@ -7,6 +7,7 @@ import dev.samstevens.totp.code.DefaultCodeVerifier;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import dev.samstevens.totp.time.TimeProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import shop.auth.exception.AppException;
@@ -22,6 +23,8 @@ public class TotpVerificationService {
     private final RefreshTokenService refreshTokenService;
     private final JWTService jwtService;
     private final UserRepository userRepository;
+    @Value("${jwt.access.duration}")
+    private long accessExpirationS;
 
     private TimeProvider timeProvider = new SystemTimeProvider();
     private CodeGenerator codeGenerator = new DefaultCodeGenerator();
@@ -37,7 +40,7 @@ public class TotpVerificationService {
                 throw new AppException(HttpStatus.BAD_REQUEST,"Invalid TOTP code.");
             }
 
-            String accessToken = jwtService.generateToken(user.getEmail());
+            String accessToken = jwtService.generateToken(user.getEmail(), accessExpirationS);
             String refresh = refreshTokenService.createRefreshToken(user.getId());
             return new UserService.AuthResult(accessToken, refresh, null);
 

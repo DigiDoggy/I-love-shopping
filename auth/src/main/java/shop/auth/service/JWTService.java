@@ -5,8 +5,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import shop.auth.exception.AppException;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
@@ -25,7 +27,7 @@ public class JWTService {
 
 
 
-    public String generateToken(String email) {
+    public String generateToken(String email, long expirationSeconds) {
 
         Map<String, Object> claims = new HashMap<>();
 
@@ -34,7 +36,7 @@ public class JWTService {
                 .add(claims)
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() +  accessExpirationS * 1000))
+                .expiration(new Date(System.currentTimeMillis() +  expirationSeconds * 1000))
                 .and()
                 .signWith(getKey(), Jwts.SIG.HS256)
                 .compact();
@@ -43,6 +45,10 @@ public class JWTService {
     private SecretKey getKey() {
         byte[] keyBytes = Base64.getDecoder().decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String generateAccessToken(String email){
+        return generateToken(email, accessExpirationS);
     }
 
     public String extractUserEmail(String token) {
@@ -67,7 +73,7 @@ public class JWTService {
         return (userEmail.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -77,5 +83,14 @@ public class JWTService {
 
     private String getEmailFromToken( String token){
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String validResetToken(String token){
+
+        if(isTokenExpired(token)){
+            throw new AppException(HttpStatus.BAD_REQUEST, "Token expired");
+        }
+
+        return getEmailFromToken(token);
     }
 }

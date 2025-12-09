@@ -37,6 +37,8 @@ build/
 # personal
 /docs/roadmap.md
 MyHelperController.md
+auth/data.env
+app/src/main/resources/sec_data.yml
 
 #Frontend
 frontend/node_modules/

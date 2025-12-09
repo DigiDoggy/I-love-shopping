@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/api/auth/recaptcha/verify").permitAll()
                         .requestMatchers("/api/verify-totp").permitAll()
+                        .requestMatchers("/api/forgot-password", "/api/reset-password").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(o -> o.disable()

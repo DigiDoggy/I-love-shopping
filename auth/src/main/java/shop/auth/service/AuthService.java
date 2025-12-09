@@ -18,7 +18,7 @@ import shop.auth.exception.ResourceNotFoundException;
 import shop.auth.mapper.UserMapper;
 import shop.auth.model.RefreshToken;
 import shop.auth.model.User;
-import shop.auth.repository.RefreshTokenRepository;
+import shop.auth.repository.TokenRepository;
 import shop.auth.repository.UserRepository;
 import shop.auth.service.twoFa.TotpSetupService;
 
@@ -34,7 +34,7 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JWTService jWTService;
     private final UserMapper userMapper;
@@ -76,7 +76,7 @@ public class AuthService {
         }
 
         // if not return jwt, refresh token
-        String accessToken= jwtService.generateToken(user.getEmail());
+        String accessToken= jwtService.generateAccessToken(user.getEmail());
         String refresh = refreshTokenService.createRefreshToken(user.getId());
 
         return new UserService.AuthResult(accessToken, refresh, null);
@@ -104,7 +104,7 @@ public class AuthService {
         }
 
         String newRefreshToken = refreshTokenService.createRefreshToken(rt.getUser().getId());
-        String newAccessToken = jWTService.generateToken(rt.getUser().getEmail());
+        String newAccessToken = jWTService.generateAccessToken(rt.getUser().getEmail());
         return Map.of(
                 "refreshToken", newRefreshToken,
                 "accessToken", newAccessToken

@@ -10,7 +10,6 @@ import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.jboss.aerogear.security.otp.api.Base32;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
 import java.util.List;
@@ -71,5 +70,5 @@ public class User{
     private List<OauthAccount> oauthAccounts;
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
-    private List<RefreshToken> refreshTokens;
+    private List<RefreshToken> tokens;
 }

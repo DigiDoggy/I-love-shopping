@@ -40,4 +40,5 @@ public class RefreshToken {
 
     @Column(name = "rotation_counter", nullable = false)
     private int rotationCounter = 0;
+
 }

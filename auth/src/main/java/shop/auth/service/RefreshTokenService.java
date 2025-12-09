@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import shop.auth.exception.AppException;
 import shop.auth.model.RefreshToken;
-import shop.auth.repository.RefreshTokenRepository;
+import shop.auth.repository.TokenRepository;
 import shop.auth.repository.UserRepository;
 
 import java.nio.charset.StandardCharsets;
@@ -24,13 +24,16 @@ import java.util.UUID;
 public class RefreshTokenService {
     @Value("${jwt.refresh.duration}")
     private long refreshExpirationS;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JWTService jwtService;
 
     public String createRefreshToken(UUID userId){
         RefreshToken token = new RefreshToken();
-        token.setUser(userRepository.findById(userId).orElseThrow());
+        token.setUser(userRepository.findById(userId).orElseThrow(
+
+                () -> new AppException(HttpStatus.NOT_FOUND, "User not found")
+        ));
 
         String refreshToken = generateRefreshToken();
         String hashToken = sha256(refreshToken);
