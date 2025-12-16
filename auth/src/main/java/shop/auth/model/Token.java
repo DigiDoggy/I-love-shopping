@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import shop.auth.enums.TokenType;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Table(name = "refresh_tokens")
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshToken {
+public class Token {
     @Id
     @GeneratedValue
     @JdbcTypeCode(SqlTypes.UUID)
@@ -29,16 +30,16 @@ public class RefreshToken {
     @Column(name = "token_hash", nullable = false)
     private String tokenHash;
 
+    @Column(name = "token_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TokenType tokenType;
+
     @Column(name = "issued_at", nullable = false)
     private Instant issuedAt = Instant.now();
 
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
 
-    @Column(name = "revoked_at")
-    private Instant revokedAt;
-
-    @Column(name = "rotation_counter", nullable = false)
-    private int rotationCounter = 0;
-
+    @Column(name = "blacklisted" , nullable = false)
+    private boolean blacklisted = false;
 }

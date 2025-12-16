@@ -4,11 +4,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import shop.auth.enums.TokenType;
+import shop.auth.exception.AppException;
+import shop.auth.model.User;
+import shop.auth.repository.UserRepository;
 import shop.auth.service.JWTService;
 
 import java.io.IOException;
@@ -18,6 +24,7 @@ import java.io.IOException;
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JWTService jwtService;
+    private final UserRepository userRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -32,8 +39,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             email = registrationId + "_" + providerUserId + "@notVerified.com";
         }
 
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST, "User not found"));
 
-        String jwt = jwtService.generateAccessToken(email);
+
+        String jwt = jwtService.generateAccessToken(email, user);
+        jwtService.saveToken(jwt,user, TokenType.REFRESH);
         response.setHeader("Authorization", "Bearer " + jwt);
         response.sendRedirect("/");
     }

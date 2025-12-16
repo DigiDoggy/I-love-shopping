@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import shop.auth.enums.TokenType;
 import shop.auth.exception.AppException;
-import shop.auth.model.RefreshToken;
+import shop.auth.model.Token;
 import shop.auth.repository.TokenRepository;
 import shop.auth.repository.UserRepository;
 
@@ -24,20 +26,22 @@ import java.util.UUID;
 public class RefreshTokenService {
     @Value("${jwt.refresh.duration}")
     private long refreshExpirationS;
-    private final TokenRepository refreshTokenRepository;
+    private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
     private final JWTService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public String createRefreshToken(UUID userId){
-        RefreshToken token = new RefreshToken();
+        Token token = new Token();
         token.setUser(userRepository.findById(userId).orElseThrow(
 
                 () -> new AppException(HttpStatus.NOT_FOUND, "User not found")
         ));
 
-        String refreshToken = generateRefreshToken();
-        String hashToken = sha256(refreshToken);
+        String refreshToken = generateRefreshToken(token.getUser().getEmail());
+        String hashToken = passwordEncoder.encode(refreshToken);
 
+        token.setTokenType(TokenType.REFRESH);
         token.setIssuedAt(Instant.now());
         token.setExpiresAt(token.getIssuedAt().plusSeconds(refreshExpirationS));
         token.setTokenHash(hashToken);
@@ -45,7 +49,7 @@ public class RefreshTokenService {
         log.info("Created refresh token for user: {} ", token.getUser().getEmail());
 
         try{
-            RefreshToken saved= refreshTokenRepository.save(token);
+            Token saved= tokenRepository.save(token);
             log.info("Saved refresh token: {}", saved.getTokenHash());
 
             return refreshToken;
@@ -55,25 +59,16 @@ public class RefreshTokenService {
         }
     }
 
-    public String generateRefreshToken(){
-        byte[] bytes = new byte[32];
-        new SecureRandom().nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-    public String sha256(String raw){
+    public String generateRefreshToken(String email){
+        long duration =jwtService.getRefreshExpirationS();
+        String token = jwtService.generateToken(email,duration );
 
-        try{
-            var md = java.security.MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(raw.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(digest);
-
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 not available.", e);
-        }
-
+       return token;
     }
 
-    public boolean isTokenExpired(RefreshToken token){
+    public boolean isTokenExpired(Token token){
         return token.getExpiresAt().isBefore(Instant.now());
     }
+
 }
+

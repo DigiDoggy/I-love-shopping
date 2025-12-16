@@ -70,5 +70,5 @@ public class User{
     private List<OauthAccount> oauthAccounts;
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
-    private List<RefreshToken> tokens;
+    private List<Token> tokens;
 }

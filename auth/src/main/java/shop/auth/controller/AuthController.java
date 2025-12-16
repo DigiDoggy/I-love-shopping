@@ -1,14 +1,15 @@
 package shop.auth.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import shop.auth.dto.*;
+import shop.auth.dto.AuthDTO;
+import shop.auth.dto.AuthRefresh;
+import shop.auth.dto.LoginResponse;
+import shop.auth.dto.UserDTO;
 import shop.auth.model.User;
 import shop.auth.service.AuthService;
 import shop.auth.service.UserService;
@@ -33,7 +34,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final ICaptchaService captchaService;
-    private final TotpVerificationService totpVerificationService;
 
 
 
@@ -86,7 +86,7 @@ public class AuthController {
             @RequestHeader(name = "Authorization", required = false) String authorizationHeader,
             HttpServletResponse resp) {
 
-        boolean success = authService.logout(refreshToken, authorizationHeader);
+        boolean success = authService.logout(refreshToken);
 
         //For clearing cookies in browser
         //        CookieUtils.deleteCookie(resp, "accessToken");

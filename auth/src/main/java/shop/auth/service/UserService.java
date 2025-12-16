@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import shop.auth.dto.UserDTO;
+import shop.auth.enums.TokenType;
 import shop.auth.exception.AppException;
 import shop.auth.mapper.UserMapper;
 import shop.auth.model.User;
@@ -43,6 +44,7 @@ public class UserService {
         );
 
         String resetToken = jwtService.generateToken(user.getEmail(), resetPasswordTokenDuration);
+        jwtService.saveToken(resetToken,user, TokenType.RESET_PASSWORD);
 
         String resetUrl = "http://localhost:8080/api/reset-password?token=" + resetToken;
         emailService.sendResetPasswordEmail(email, resetUrl);
@@ -54,11 +56,10 @@ public class UserService {
             throw new RuntimeException("Passwords do not match");
         }
 
-        String email = jwtService.validResetToken(token);
 
-       User user=userRepository.findByEmail(email).orElseThrow(
-               ()-> new AppException(HttpStatus.BAD_REQUEST ,"User not found")
-       );
+        var result = jwtService.validateToken(token, TokenType.RESET_PASSWORD);
+
+       User user= result.user();
 
        user.setPasswordHash(passwordEncoder.encode(newPassword));
 
@@ -66,20 +67,6 @@ public class UserService {
 
        return true;
     }
-
-
-    public void createMailForgetPassword(String email){
-
-
-
-    }
-
-
-
-
-
-
-
 
     public record AuthResult( String accessToken, String refreshToken, String totp){}
 }

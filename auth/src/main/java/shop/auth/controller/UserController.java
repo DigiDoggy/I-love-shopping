@@ -1,10 +1,14 @@
 package shop.auth.controller;
 
+import com.nimbusds.jose.JWEAlgorithm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shop.auth.dto.ResetPasswordRequest;
 import shop.auth.dto.UserDTO;
+import shop.auth.exception.AppException;
+import shop.auth.service.JWTService;
 import shop.auth.service.RefreshTokenService;
 import shop.auth.service.UserService;
 
@@ -16,6 +20,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final JWTService jwtService;
 
 
     @GetMapping("/users")
@@ -32,6 +37,14 @@ public class UserController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request){
+        // check if token is valid
+        if(request.token()==null || request.token().isBlank()){
+            throw new AppException(HttpStatus.BAD_REQUEST, "Token not found");
+        }
+
+        if (jwtService.isTokenExpired(request.token())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Token expired");
+        }
 
         boolean result = userService.resetPassword(
                 request.token(),
