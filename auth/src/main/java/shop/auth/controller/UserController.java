@@ -1,6 +1,5 @@
 package shop.auth.controller;
 
-import com.nimbusds.jose.JWEAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,21 +23,21 @@ public class UserController {
 
 
     @GetMapping("/users")
-    public List<UserDTO> getUsers(){
+    public List<UserDTO> getUsers() {
         System.out.println("UserController.getUsers");
         return userService.getUsers();
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgottenPassword(@RequestParam String email){
+    public ResponseEntity<?> forgottenPassword(@RequestParam String email) {
         userService.forgottenPassword(email);
         return ResponseEntity.ok("Check your email for further instructions");
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request){
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         // check if token is valid
-        if(request.token()==null || request.token().isBlank()){
+        if (request.token() == null || request.token().isBlank()) {
             throw new AppException(HttpStatus.BAD_REQUEST, "Token not found");
         }
 

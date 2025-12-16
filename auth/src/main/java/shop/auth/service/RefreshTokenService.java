@@ -12,12 +12,7 @@ import shop.auth.model.Token;
 import shop.auth.repository.TokenRepository;
 import shop.auth.repository.UserRepository;
 
-import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.HexFormat;
 import java.util.UUID;
 
 @Slf4j
@@ -31,7 +26,7 @@ public class RefreshTokenService {
     private final JWTService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    public String createRefreshToken(UUID userId){
+    public String createRefreshToken(UUID userId) {
         Token token = new Token();
         token.setUser(userRepository.findById(userId).orElseThrow(
 
@@ -48,25 +43,25 @@ public class RefreshTokenService {
 
         log.info("Created refresh token for user: {} ", token.getUser().getEmail());
 
-        try{
-            Token saved= tokenRepository.save(token);
+        try {
+            Token saved = tokenRepository.save(token);
             log.info("Saved refresh token: {}", saved.getTokenHash());
 
             return refreshToken;
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error saving refresh token for user: {}, Error: {}", userId, e.getMessage());
-            throw new AppException( HttpStatus.INTERNAL_SERVER_ERROR,"Could not create refresh token");
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not create refresh token");
         }
     }
 
-    public String generateRefreshToken(String email){
-        long duration =jwtService.getRefreshExpirationS();
-        String token = jwtService.generateToken(email,duration );
+    public String generateRefreshToken(String email) {
+        long duration = jwtService.getRefreshExpirationS();
+        String token = jwtService.generateToken(email, duration);
 
-       return token;
+        return token;
     }
 
-    public boolean isTokenExpired(Token token){
+    public boolean isTokenExpired(Token token) {
         return token.getExpiresAt().isBefore(Instant.now());
     }
 

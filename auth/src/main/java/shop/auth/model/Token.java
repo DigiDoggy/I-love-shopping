@@ -24,7 +24,7 @@ public class Token {
     private UUID id;
     @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
-    @JoinColumn(name = "user_id",nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
     //token info
     @Column(name = "token_hash", nullable = false)
@@ -40,6 +40,6 @@ public class Token {
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
 
-    @Column(name = "blacklisted" , nullable = false)
+    @Column(name = "blacklisted", nullable = false)
     private boolean blacklisted = false;
 }

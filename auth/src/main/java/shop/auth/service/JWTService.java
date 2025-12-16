@@ -19,7 +19,10 @@ import shop.auth.repository.TokenRepository;
 import shop.auth.repository.UserRepository;
 
 import javax.crypto.SecretKey;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Slf4j
@@ -65,7 +68,7 @@ public class JWTService {
         String tokenHash = passwordEncoder.encode(token);
 
         long time = switch (tokenType) {
-            case ACCESS ->  accessExpirationS;
+            case ACCESS -> accessExpirationS;
             case REFRESH -> refreshExpirationS;
             case RESET_PASSWORD -> resetPasswordTokenDuration;
             default -> throw new RuntimeException("Invalid token type" + tokenType);
@@ -84,8 +87,8 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateAccessToken(String email, User user ) {
-        if(user!=null){
+    public String generateAccessToken(String email, User user) {
+        if (user != null) {
             tokenRepository.deleteByUserIdAndType(user.getId(), TokenType.ACCESS);
         }
 
@@ -113,8 +116,6 @@ public class JWTService {
     }
 
 
-
-
     public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -134,7 +135,7 @@ public class JWTService {
     }
 
     // validate token and return user for All Token (reset, refresh "work for access to") services
-    public TokenValidationResult validateToken(String token, TokenType tokenType){
+    public TokenValidationResult validateToken(String token, TokenType tokenType) {
 
         String email = extractUserEmail(token);
 
@@ -153,7 +154,7 @@ public class JWTService {
         return new TokenValidationResult(user, tokenEntity);
     }
 
-    public record TokenValidationResult(User user, Token tokenEntity){
+    public record TokenValidationResult(User user, Token tokenEntity) {
 
     }
 

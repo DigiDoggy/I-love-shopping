@@ -32,7 +32,7 @@ public class TotpController {
     @PostMapping("/verify-totp")
     public ResponseEntity<?> verifyTotp(@RequestBody TotpVerificationRequest request, HttpServletResponse resp) throws Exception {
         UserService.AuthResult result = verifyTotpService.verifyTotp(request.email(), request.totp());
-        if (result!=null) {
+        if (result != null) {
 
             CookieUtils.addCookie(resp, "refreshToken", result.refreshToken(), refreshDuration);
 

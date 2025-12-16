@@ -4,7 +4,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -44,7 +43,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
 
         String jwt = jwtService.generateAccessToken(email, user);
-        jwtService.saveToken(jwt,user, TokenType.REFRESH);
+        jwtService.saveToken(jwt, user, TokenType.REFRESH);
         response.setHeader("Authorization", "Bearer " + jwt);
         response.sendRedirect("/");
     }

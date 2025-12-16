@@ -37,7 +37,7 @@ public class TotpVerificationService {
             boolean isValid = verifier.isValidCode(user.getTwoFaSecret(), code);
 
             if (!isValid) {
-                throw new AppException(HttpStatus.BAD_REQUEST,"Invalid TOTP code.");
+                throw new AppException(HttpStatus.BAD_REQUEST, "Invalid TOTP code.");
             }
 
             String accessToken = jwtService.generateToken(user.getEmail(), accessExpirationS);

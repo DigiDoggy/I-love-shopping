@@ -22,6 +22,7 @@ public class AppExceptionHandler {
         );
         return new ResponseEntity<>(error, e.getStatus());
     }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> globalExceptionHandler(Exception e, WebRequest request) {
         ErrorDetails error = new ErrorDetails(

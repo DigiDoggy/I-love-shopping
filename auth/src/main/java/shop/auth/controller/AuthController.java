@@ -15,7 +15,6 @@ import shop.auth.service.AuthService;
 import shop.auth.service.UserService;
 import shop.auth.service.reCaptcha.CaptchaService;
 import shop.auth.service.reCaptcha.ICaptchaService;
-import shop.auth.service.twoFa.TotpVerificationService;
 import shop.auth.util.CookieUtils;
 
 import java.util.Map;
@@ -34,7 +33,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final ICaptchaService captchaService;
-
 
 
     @PostMapping("/refresh")
@@ -59,9 +57,9 @@ public class AuthController {
 
         UserService.AuthResult result = authService.login(request);
 
-        if(result.accessToken()==null && result.totp()==null){
-            return ResponseEntity.badRequest().body(new LoginResponse(false, null, null,null ));
-        } else if(result.totp()!=null){
+        if (result.accessToken() == null && result.totp() == null) {
+            return ResponseEntity.badRequest().body(new LoginResponse(false, null, null, null));
+        } else if (result.totp() != null) {
             return ResponseEntity.ok(new LoginResponse(true, null, null, result.totp()));
         }
 

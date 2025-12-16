@@ -8,10 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.auth.config.OAuth2SuccessHandler;
 import shop.auth.dto.AuthDTO;
 import shop.auth.dto.UserDTO;
 import shop.auth.enums.TokenError;
@@ -27,23 +25,20 @@ import shop.auth.service.twoFa.TotpSetupService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserService userService;
+
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
     private final JWTService jWTService;
     private final UserMapper userMapper;
     private final JWTService jwtService;
     private final TotpSetupService totpSetupService;
-    private final PasswordEncoder passwordEncoder;
 
 
     private BCryptPasswordEncoder bCrypPasswordEncoder = new BCryptPasswordEncoder(12);
@@ -87,7 +82,7 @@ public class AuthService {
     @Transactional
     public Map<String, String> refresh(String refreshToken) {
 
-        if(refreshToken == null || refreshToken.isBlank()){
+        if (refreshToken == null || refreshToken.isBlank()) {
             throw new TokenValidationException(TokenError.TOKEN_NOT_FOUND);
         }
 
@@ -96,14 +91,14 @@ public class AuthService {
         User user = result.user();
         Token tokenEntity = result.tokenEntity();
 
-        if(tokenEntity.isBlacklisted()){
+        if (tokenEntity.isBlacklisted()) {
             throw new TokenValidationException(TokenError.TOKEN_BLACKLISTED);
         }
 
-        if(refreshTokenService.isTokenExpired(tokenEntity)){
+        if (refreshTokenService.isTokenExpired(tokenEntity)) {
             tokenRepository.delete(tokenEntity);
             throw new TokenValidationException(TokenError.TOKEN_EXPIRED);
-        }else{
+        } else {
             tokenRepository.delete(tokenEntity);
         }
 
@@ -124,7 +119,7 @@ public class AuthService {
             return false;
         }
 
-        var result =jwtService.validateToken(refreshToken, TokenType.REFRESH);
+        var result = jwtService.validateToken(refreshToken, TokenType.REFRESH);
         User user = result.user();
         Token tokenEntity = result.tokenEntity();
 
@@ -133,7 +128,7 @@ public class AuthService {
         return isRepEmpty(user);
     }
 
-    private boolean isRepEmpty(User user){
+    private boolean isRepEmpty(User user) {
         List<Token> tokens = tokenRepository.findByUserId(user.getId());
         return tokens.isEmpty();
     }
