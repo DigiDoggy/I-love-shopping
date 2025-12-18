@@ -3,6 +3,8 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
+//todo before disable 2Fa need send QR code to client for auth.
+
 function App() {
   const [count, setCount] = useState(0)
 

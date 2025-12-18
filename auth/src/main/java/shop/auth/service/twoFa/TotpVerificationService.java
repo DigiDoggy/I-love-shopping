@@ -31,6 +31,15 @@ public class TotpVerificationService {
     private CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
 
 
+    public boolean verifyTotpCode(String email,String code){
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new AppException(HttpStatus.BAD_REQUEST,"User not found")
+        );
+
+        return verifier.isValidCode(user.getTwoFaSecret(), code);
+
+    }
+
     public UserService.AuthResult verifyTotp(String email, String code) throws Exception {
         try {
             User user = userRepository.findByEmail(email).orElseThrow();

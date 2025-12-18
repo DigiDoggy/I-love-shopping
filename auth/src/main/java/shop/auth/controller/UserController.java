@@ -15,7 +15,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
@@ -53,4 +53,6 @@ public class UserController {
 
         return ResponseEntity.ok(result);
     }
+
+
 }

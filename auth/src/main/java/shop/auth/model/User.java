@@ -40,12 +40,13 @@ public class User {
     private String phoneNumber;
     @Column(nullable = false)
     private String roles;
-    @Column(name = "is_2fa_enabled")
+    @Column(name = "is_2fa_enabled", nullable = false)
     private boolean twoFaEnabled;
     @Column(name = "2_fa_secret")
     private String twoFaSecret;
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     private Instant createdAt = Instant.now();
+    //todo need to check if it is needed, then create some massage for user about email verification
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified = false;
 
