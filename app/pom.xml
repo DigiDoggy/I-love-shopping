@@ -22,10 +22,11 @@
         <!--            <groupId>shop</groupId>-->
         <!--            <artifactId>common</artifactId>-->
         <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>shop</groupId>-->
-        <!--            <artifactId>catalog</artifactId>-->
-        <!--        </dependency>-->
+                <dependency>
+                    <groupId>shop.catalog</groupId>
+                    <artifactId>catalog</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
 
         <!--Dependency-->
 
@@ -39,12 +40,6 @@
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>9.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.7</version>
         </dependency>
 
         <dependency>
