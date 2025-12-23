@@ -18,7 +18,8 @@ public interface UserMapper {
             @Mapping(target = "twoFaEnabled", constant = "false"),
             @Mapping(target = "roles", constant = "USER"),
             @Mapping(target = "oauthAccounts", ignore = true),
-            @Mapping(target = "tokens", ignore = true)
+            @Mapping(target = "tokens", ignore = true),
+            @Mapping(target = "addresses", ignore = false)
     })
     User registerRequest(UserDTO userDTO);
 

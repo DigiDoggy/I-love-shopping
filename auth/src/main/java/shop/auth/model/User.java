@@ -50,6 +50,7 @@ public class User {
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified = false;
 
+
     private String generateTwoFaSecret() {
         return Base32.random();
     }
@@ -68,6 +69,8 @@ public class User {
 //    @Column(name="credentials_non_expired", nullable=false)
 //    private boolean credentialsNonExpired = true;
 
+    @OneToMany(mappedBy = "user")
+    private List<Address> addresses;
     @OneToMany(mappedBy = "user")
     private List<OauthAccount> oauthAccounts;
     @OneToMany(mappedBy = "user")
