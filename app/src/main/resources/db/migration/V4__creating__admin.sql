@@ -1,0 +1,2 @@
+INSERT INTO users (id, email, password_hash, user_name, phone_country_code, phone_number, user_role, is_2fa_enabled, created_at, email_verified)
+VALUES ('<uuid>', 'admin@example.com', '<bcrypt_hash>', 'Admin', '+0', '000000000', 'ROLE_ADMIN', false, now(), true);

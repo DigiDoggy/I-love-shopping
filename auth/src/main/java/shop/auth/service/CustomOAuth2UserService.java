@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import shop.auth.enums.Roles;
 import shop.auth.model.OauthAccount;
 import shop.auth.model.User;
 import shop.auth.repository.OauthAccountRepository;
@@ -74,7 +75,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         u.setPasswordHash(PasswordUtil.generatePasswordHash());
                         u.setPhoneCountryCode("+0");
                         u.setPhoneNumber(finalEmail);
-                        u.setRoles("ROLE_USER");
+                        u.setRoles(Roles.ROLE_USER);
                         u.setEmailVerified(emailVerified);
                         return userRepository.save(u);
                     });

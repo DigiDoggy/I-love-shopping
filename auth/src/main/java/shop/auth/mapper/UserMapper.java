@@ -10,13 +10,13 @@ import shop.auth.model.User;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mappings({
+    @Mappings(value = {
             @Mapping(target = "passwordHash", source = "password"),
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "createdAt", expression = "java(java.time.Instant.now())"),
             @Mapping(target = "emailVerified", constant = "false"),
             @Mapping(target = "twoFaEnabled", constant = "false"),
-            @Mapping(target = "roles", constant = "USER"),
+            @Mapping(target = "roles", expression = "java(shop.auth.enums.Roles.ROLE_USER)"),
             @Mapping(target = "oauthAccounts", ignore = true),
             @Mapping(target = "tokens", ignore = true),
             @Mapping(target = "addresses", ignore = false)

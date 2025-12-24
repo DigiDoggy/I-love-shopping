@@ -11,6 +11,7 @@ import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.jboss.aerogear.security.otp.api.Base32;
+import shop.auth.enums.Roles;
 
 import java.time.Instant;
 import java.util.List;
@@ -38,11 +39,12 @@ public class User {
     private String phoneCountryCode;
     @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
-    @Column(nullable = false)
-    private String roles;
+    @Column(name = "user_role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Roles roles;
     @Column(name = "is_2fa_enabled", nullable = false)
     private boolean twoFaEnabled;
-    @Column(name = "2_fa_secret")
+    @Column(name = "totp_secret")
     private String twoFaSecret;
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();
@@ -71,7 +73,8 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Address> addresses;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<OauthAccount> oauthAccounts;
     @OneToMany(mappedBy = "user")
     @ToString.Exclude

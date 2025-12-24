@@ -2,6 +2,7 @@ package shop.auth.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -29,8 +30,9 @@ public class Address {
     @Column(name = "default_address",nullable = false)
     private boolean defaultAddress;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable = false)
+    @ToString.Exclude
     private User user;
 
 

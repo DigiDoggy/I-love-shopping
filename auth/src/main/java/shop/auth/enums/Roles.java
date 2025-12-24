@@ -1,6 +1,6 @@
 package shop.auth.enums;
 
 public enum Roles {
-    USER,
-    ADMIN
+    ROLE_USER,
+    ROLE_ADMIN
 }
