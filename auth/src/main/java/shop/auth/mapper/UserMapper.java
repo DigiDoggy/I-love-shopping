@@ -19,7 +19,6 @@ public interface UserMapper {
             @Mapping(target = "roles", expression = "java(shop.auth.enums.Roles.ROLE_USER)"),
             @Mapping(target = "oauthAccounts", ignore = true),
             @Mapping(target = "tokens", ignore = true),
-            @Mapping(target = "addresses", ignore = false)
     })
     User registerRequest(UserDTO userDTO);
 

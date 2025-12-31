@@ -7,6 +7,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -23,14 +24,17 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
-    @OneToOne
-    @JoinColumn(name = "image_id", nullable = false)
-    private ProductImage image;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images;
+
     private String name;
+    @Column(unique = true, nullable = false)
+    private String slug;
     private String description;
     private double price;
     @Column(name = "stock_quantity", nullable = false)

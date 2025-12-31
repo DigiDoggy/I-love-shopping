@@ -1,11 +1,20 @@
 package shop.auth.dto;
 
-import java.util.UUID;
+import shop.auth.enums.Roles;
+import shop.auth.model.Address;
 
-public record UserDTO(UUID id,
-                      String userName,
-                      String email,
-                      String password,
-                      String phoneCountryCode,
-                      String phoneNumber) {
+public record UserDTO(
+        String id,
+        String email,
+        String userName,
+        String phoneCountryCode,
+        String phoneNumber,
+        Roles roles,
+        boolean twoFaEnabled,
+        String twoFaSecret,
+        String createdAt,
+        String updatedAt,
+        boolean emailVerified,
+        Address defaultAddress
+        ) {
 }

@@ -17,5 +17,7 @@ public class Category {
     private UUID id;
     @Column(nullable = false)
     private String name;
+    @Column(nullable = false, unique = true)
+    private String slug;
 
 }

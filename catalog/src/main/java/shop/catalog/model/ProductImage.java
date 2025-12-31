@@ -18,9 +18,10 @@ public class ProductImage {
     private UUID id;
     private String url;
     private boolean isPrimary;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 

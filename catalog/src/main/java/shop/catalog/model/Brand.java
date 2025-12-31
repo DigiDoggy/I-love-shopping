@@ -15,8 +15,9 @@ public class Brand {
     @GeneratedValue
     @JdbcTypeCode(SqlTypes.UUID)
     private UUID id;
-
     @Column(nullable = false)
     private String name;
+    @Column(unique = true, nullable = false)
+    private String slug;
 
 }

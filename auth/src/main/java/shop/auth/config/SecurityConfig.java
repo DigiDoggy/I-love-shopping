@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/api/auth/recaptcha/verify").permitAll()
                         .requestMatchers("/api/verify-totp").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs.yaml").permitAll()
                         .requestMatchers("/api/forgot-password", "/api/reset-password").permitAll()
                         .anyRequest().authenticated()
                 )

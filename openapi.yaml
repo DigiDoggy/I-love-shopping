@@ -1,0 +1,364 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /api/user/reset-password:
+    post:
+      tags:
+      - user-controller
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/user/forgot-password:
+    post:
+      tags:
+      - user-controller
+      operationId: forgottenPassword
+      parameters:
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/two-2fa/verify:
+    post:
+      tags:
+      - totp-controller
+      operationId: verifyTotp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TotpVerificationRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/two-2fa/two-enable:
+    post:
+      tags:
+      - totp-controller
+      operationId: enableTwoFa
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/two-2fa/two-disable:
+    post:
+      tags:
+      - totp-controller
+      operationId: disableTwoFa
+      parameters:
+      - name: code
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/auth/register:
+    post:
+      tags:
+      - auth-controller
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/auth/refresh:
+    post:
+      tags:
+      - auth-controller
+      operationId: refreshToken
+      parameters:
+      - name: refreshToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/auth/recaptcha/verify:
+    post:
+      tags:
+      - auth-controller
+      operationId: verifyRecaptcha
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/auth/logout:
+    post:
+      tags:
+      - auth-controller
+      operationId: logout
+      parameters:
+      - name: refreshToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/auth/login:
+    post:
+      tags:
+      - auth-controller
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+  /api/user/users:
+    get:
+      tags:
+      - user-controller
+      operationId: getUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDTO"
+  /api/auth/:
+    get:
+      tags:
+      - auth-controller
+      operationId: createIndex
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+components:
+  schemas:
+    ResetPasswordRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        password:
+          type: string
+        confirmPassword:
+          type: string
+    TotpVerificationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        totp:
+          type: string
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        phoneCountryCode:
+          type: string
+        phoneNumber:
+          type: string
+    Address:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        street:
+          type: string
+        city:
+          type: string
+        stateProvince:
+          type: string
+        zipCode:
+          type: string
+        country:
+          type: string
+        defaultAddress:
+          type: boolean
+        user:
+          $ref: "#/components/schemas/User"
+    OauthAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        provider:
+          type: string
+        providerUserId:
+          type: string
+        user: {}
+    Token:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user: {}
+        tokenHash:
+          type: string
+        tokenType:
+          type: string
+          enum:
+          - ACCESS
+          - REFRESH
+          - RESET_PASSWORD
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        blacklisted:
+          type: boolean
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        userName:
+          type: string
+        passwordHash:
+          type: string
+        phoneCountryCode:
+          type: string
+        phoneNumber:
+          type: string
+        roles:
+          type: string
+          enum:
+          - ROLE_USER
+          - ROLE_ADMIN
+        twoFaEnabled:
+          type: boolean
+        twoFaSecret:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        emailVerified:
+          type: boolean
+        addresses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Address"
+        oauthAccounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/OauthAccount"
+        tokens:
+          type: array
+          items:
+            $ref: "#/components/schemas/Token"
+    AuthDTO:
+      type: object
+      properties:
+        password:
+          type: string
+        email:
+          type: string
+    LoginResponse:
+      type: object
+      properties:
+        isLogged:
+          type: boolean
+        accessToken:
+          type: string
+        expiresIn:
+          type: integer
+          format: int64
+        totp:
+          type: string
