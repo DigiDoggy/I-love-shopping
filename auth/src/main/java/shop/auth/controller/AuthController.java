@@ -1,16 +1,17 @@
 package shop.auth.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import shop.auth.dto.AuthDTO;
-import shop.auth.dto.AuthRefresh;
-import shop.auth.dto.LoginResponse;
 import shop.auth.dto.UserDTO;
-import shop.auth.model.User;
+import shop.auth.dto.request.RegisterRequest;
+import shop.auth.dto.response.AuthDTO;
+import shop.auth.dto.response.LoginResponse;
+import shop.auth.dto.response.RefreshResponse;
 import shop.auth.service.AuthService;
 import shop.auth.service.UserService;
 import shop.auth.service.reCaptcha.CaptchaService;
@@ -41,12 +42,10 @@ public class AuthController {
             HttpServletResponse resp) {
 
         Map<String, String> tokens = authService.refresh(token);
-
-        //        CookieUtils.addCookie(resp, "accessToken", tokens.get("accessToken"), accessTokenDuration);
         CookieUtils.addCookie(resp, "refreshToken", tokens.get("refreshToken"), refreshDuration);
 
 
-        return ResponseEntity.ok().body(new AuthRefresh(tokens.get("accessToken"), accessTokenDuration));
+        return ResponseEntity.ok().body(new RefreshResponse(tokens.get("accessToken"), accessTokenDuration));
     }
 
 
@@ -72,10 +71,12 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public User register(@RequestBody UserDTO userDTO) {
-//        captchaService.processResponse(request.response, CaptchaService.REGISTRATION_ACTION);
-        return authService.register(userDTO);
+    public ResponseEntity<UserDTO> register(@RequestBody  @Valid RegisterRequest request) {
+        captchaService.processResponse(request.recaptchaToken(), CaptchaService.REGISTRATION_ACTION);
+         UserDTO userDTO = authService.register(request);
 
+         //status 201 for creating new user
+         return ResponseEntity.status(201).body(userDTO);
     }
 
     @PostMapping("/logout")
@@ -98,10 +99,6 @@ public class AuthController {
     @ResponseBody
     public String createIndex() {
         return "Hello World from oa2Auth";
-    }
-
-    // for distributing requests (otherwise further req ==null)
-    public record RegisterRequest(UserDTO user, String response, String action) {
     }
 
     //test reCAptcha

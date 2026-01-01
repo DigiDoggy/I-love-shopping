@@ -3,6 +3,7 @@ package shop.auth.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.aspectj.weaver.ast.Not;
 
 import java.util.List;
 
@@ -19,6 +20,8 @@ public record RegisterRequest(
         String phoneCountryCode,
         @NotBlank(message = "Phone number must not be blank")
         String phoneNumber,
-        List<AddressRequest> addresses
+        List<AddressRequest> addresses,
+        @NotBlank(message = "Recaptcha token must not be blank")
+        String recaptchaToken
 ) {
 }

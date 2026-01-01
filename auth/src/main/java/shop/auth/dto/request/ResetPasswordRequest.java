@@ -1,4 +1,4 @@
-package shop.auth.dto;
+package shop.auth.dto.request;
 
 public record ResetPasswordRequest(
         String token,

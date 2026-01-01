@@ -1,4 +1,4 @@
-package shop.auth.dto;
+package shop.auth.dto.response;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.NotNull;

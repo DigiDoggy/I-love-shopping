@@ -71,7 +71,7 @@ public class User {
 //    @Column(name="credentials_non_expired", nullable=false)
 //    private boolean credentialsNonExpired = true;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @ToString.Exclude

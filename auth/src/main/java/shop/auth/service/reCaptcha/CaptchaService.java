@@ -7,7 +7,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import shop.auth.config.CaptchaSettings;
-import shop.auth.dto.GoogleResponse;
+import shop.auth.dto.response.GoogleResponse;
 import shop.auth.exception.InvalidReCaptchaException;
 
 import java.net.URI;

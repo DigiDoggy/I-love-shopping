@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import shop.auth.dto.ResetPasswordRequest;
+import shop.auth.dto.request.ResetPasswordRequest;
 import shop.auth.dto.UserDTO;
 import shop.auth.exception.AppException;
 import shop.auth.service.JWTService;

@@ -2,6 +2,7 @@ package shop.auth.mapper;
 
 import org.mapstruct.*;
 import shop.auth.dto.request.AddressRequest;
+import shop.auth.dto.response.AddressResponse;
 import shop.auth.model.Address;
 
     @Mapper(componentModel = "spring")
@@ -11,4 +12,6 @@ import shop.auth.model.Address;
         @Mapping(target = "user", ignore = true)
         @Mapping(target = "defaultAddress", source = "isDefault")
         Address toEntity(AddressRequest dto);
+        @Mapping(target = "isDefault", source = "defaultAddress")
+        AddressResponse toResponse(Address address);
     }

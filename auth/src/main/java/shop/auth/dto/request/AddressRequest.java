@@ -1,20 +1,19 @@
 package shop.auth.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 public record AddressRequest(
 
-        @NotNull(message = "Street must not be blank")
-        String street,
-        @NotNull(message = "City must not be blank")
+        @NotBlank
+                String street,
+        @NotBlank
         String city,
-        @NotNull(message = "State/Province must not be blank")
+        @NotBlank
         String stateProvince,
-        @NotNull(message = "Zip code must not be blank")
+        @NotBlank
         String zipCode,
-        @NotNull(message = "Country must not be blank")
+        @NotBlank
         String country,
-        @NotNull(message = "Default address must not be blank")
         boolean isDefault
 ) {
 }

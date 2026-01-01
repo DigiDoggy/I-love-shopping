@@ -1,4 +1,4 @@
-package shop.auth.dto;
+package shop.auth.dto.response;
 
 public record AuthDTO(
         String password,

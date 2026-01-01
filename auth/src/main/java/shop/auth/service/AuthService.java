@@ -7,22 +7,27 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.auth.dto.AuthDTO;
 import shop.auth.dto.UserDTO;
+import shop.auth.dto.request.AddressRequest;
+import shop.auth.dto.request.RegisterRequest;
+import shop.auth.dto.response.AuthDTO;
 import shop.auth.enums.TokenError;
 import shop.auth.enums.TokenType;
 import shop.auth.exception.AppException;
 import shop.auth.exception.tokenErrors.TokenValidationException;
+import shop.auth.mapper.AddressMapper;
 import shop.auth.mapper.UserMapper;
+import shop.auth.model.Address;
 import shop.auth.model.Token;
 import shop.auth.model.User;
 import shop.auth.repository.TokenRepository;
 import shop.auth.repository.UserRepository;
 import shop.auth.service.twoFa.TotpSetupService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,36 +40,50 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
-    private final JWTService jWTService;
     private final UserMapper userMapper;
     private final JWTService jwtService;
     private final TotpSetupService totpSetupService;
+    private final AddressMapper addressMapper;
+    private final PasswordEncoder passwordEncoder;
 
-
-    private BCryptPasswordEncoder bCrypPasswordEncoder = new BCryptPasswordEncoder(12);
 
     //todo need implement request validation
-    public User register(@NotNull UserDTO userDTO) {
+    @Transactional
+    public UserDTO register(@NotNull RegisterRequest request) {
 
-        if (userRepository.existsByEmailIgnoreCase(userDTO.email())) {
+        if (userRepository.existsByEmailIgnoreCase(request.email())) {
             throw new AppException(HttpStatus.CONFLICT, "Email already in use");
         }
 
-        User user = userMapper.registerRequest(userDTO);
-        String secret = totpSetupService.createSecrete();
-
-        user.setPasswordHash(bCrypPasswordEncoder.encode(userDTO.password()));
+        User user = userMapper.toEntity(request);
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setEmail(user.getEmail().toLowerCase());
-        user.setTwoFaSecret(secret);
 
-        return userRepository.save(user);
+        // write addresses for db
+        List<Address> addresses = new ArrayList<>();
+        if (request.addresses() != null) {
+            for (AddressRequest dto : request.addresses()) {
+                Address address = addressMapper.toEntity(dto);
+                addresses.add(address);
+                address.setUser(user);
+            }
+        }
+
+        long defaults = addresses.stream().filter(Address::isDefaultAddress).count();
+        if (defaults > 1) throw new AppException(HttpStatus.BAD_REQUEST, "Only one default address allowed");
+        if (!addresses.isEmpty() && defaults == 0) addresses.get(0).setDefaultAddress(true);
+
+        user.setAddresses(addresses);
+        User savedUser = userRepository.save(user);
+
+        return userMapper.toDTO(savedUser);
     }
 
     public UserService.AuthResult login(AuthDTO request) {
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
-        User user = userRepository.findByEmail(request.email()).orElseThrow();
+        User user = userRepository.findByEmail(request.email().toLowerCase()).orElseThrow();
 
         // if we have 2fa enabled, return totp
         if (user.isTwoFaEnabled()) {
@@ -94,16 +113,13 @@ public class AuthService {
         if (tokenEntity.isBlacklisted()) {
             throw new TokenValidationException(TokenError.TOKEN_BLACKLISTED);
         }
-
-        if (refreshTokenService.isTokenExpired(tokenEntity)) {
-            tokenRepository.delete(tokenEntity);
+        boolean expired = refreshTokenService.isTokenExpired(tokenEntity);
+        if (expired) {
             throw new TokenValidationException(TokenError.TOKEN_EXPIRED);
-        } else {
-            tokenRepository.delete(tokenEntity);
         }
 
         String newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
-        String newAccessToken = jWTService.generateAccessToken(user.getEmail(), user);
+        String newAccessToken = jwtService.generateAccessToken(user.getEmail(), user);
 
         return Map.of(
                 "refreshToken", newRefreshToken,
@@ -125,10 +141,10 @@ public class AuthService {
 
         revokeTokensOfUser(user);
 
-        return isRepEmpty(user);
+        return isEmpty(user);
     }
 
-    private boolean isRepEmpty(User user) {
+    private boolean isEmpty(User user) {
         List<Token> tokens = tokenRepository.findByUserId(user.getId());
         return tokens.isEmpty();
     }
