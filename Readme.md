@@ -66,14 +66,20 @@ from the database schema and authentication to the product catalog and API docum
 
 ### 1. Clone the repository
 ```bash
-  git clone https://gitea.kood.tech/iljaaituganov/dot-com-retail.git
+  git clone https://github.com/DigiDoggy/I-love-shopping.git
 cd i-love-shopping 
 ```
-### 2. Start Docker services
+### 2. Configure secrets
+Copy the template and fill in your own keys. `.env` is git-ignored and is read by both Spring Boot and Docker Compose.
+```bash
+cp .env.example .env
+```
+
+### 3. Start Docker services
 ```bash
   docker-compose up -d
 ```
-### 3. Run the backend
+### 4. Run the backend
 dev
 ```bash
   ./mvnw spring-boot:run -pl app -Dspring-boot.run.profiles=dev

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/iloveshop
-    username: admin
-    password: 1234
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/iloveshop}
+    username: ${DB_USER:admin}
+    password: ${DB_PASSWORD:1234}
     profiles:
       active: dev
   jpa:
@@ -12,22 +12,6 @@ spring:
     enabled: false
     locations: classpath:db/migration
     baseline-on-migrate: false
-  security:
-    oauth2:
-      client:
-        registration:
-          #todo need understand how secure client secrets
-          google:
-            client-id: 777319325568-5e5ps42822bqbmqvf4jmaj846pti2fpj.apps.googleusercontent.com
-            client-secret: ***REMOVED***
-            scope: openid, profile, email
-            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
-          github:
-            client-id: Ov23lihVOtbA6rXHMfas
-            client-secret: ***REMOVED***
-            scope: read:user, user:email
-            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
-    debug: true
   output:
     ansi:
       enabled: always
@@ -36,10 +20,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,beans,info
+        include: health,info
   endpoint:
     health:
-      show-details: always
+      show-details: never
 
 logging:
   level:
@@ -52,18 +36,9 @@ logging:
 jwt:
   refreshExpirationMs: 604800000
 
-# JWT TOKEN
-JWT_TOKEN_SECRET: ***REMOVED***
-
 JWT_ACCESS_TOKEN_DURATION_SECONDS: 900
 JWT_REFRESH_TOKEN_DURATION_SECONDS: 604800
 JWT_RESET_PASSWORD_TOKEN_DURATION_SECONDS: 900
-
-#reCAPCHA
-
-RECAPTCHA_SECRET_KEY: ***REMOVED***
-FRONTEND_RECAPTCHA_SITE_KEY: 6LfG_wksAAAAAAxIvH0CJ6WGuK8EkT8-p4TGO_Ni
-
 
 #Some things about security was from
 #https://github.com/hichambouttaj/jwt-access-refresh-cookie-spring-security

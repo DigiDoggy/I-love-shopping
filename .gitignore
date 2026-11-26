@@ -49,3 +49,8 @@ frontend/dist/
 *.log
 logback/
 app/logback
+
+# Local secrets
+.env
+*.env
+!.env.example

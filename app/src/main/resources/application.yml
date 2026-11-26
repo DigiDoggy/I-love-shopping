@@ -1,4 +1,7 @@
 spring:
+  config:
+    # local secrets: copy .env.example to .env in the project root (never commit .env)
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
   mail:
     host: smtp.gmail.com
     port: 587
@@ -10,9 +13,9 @@ spring:
   profiles:
     active: dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/iloveshop
-    username: admin
-    password: 1234
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/iloveshop}
+    username: ${DB_USER:admin}
+    password: ${DB_PASSWORD:1234}
   jpa:
     hibernate:
       ddl-auto: update
@@ -25,13 +28,13 @@ spring:
       client:
         registration:
           google:
-            client-id: 777319325568-5e5ps42822bqbmqvf4jmaj846pti2fpj.apps.googleusercontent.com
-            client-secret: ***REMOVED***
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: openid, profile, email
             redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
           github:
-            client-id: Ov23lihVOtbA6rXHMfas
-            client-secret: ***REMOVED***
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
             scope: read:user, user:email
             redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
 
@@ -39,10 +42,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,beans,info
+        include: health,info
   endpoint:
     health:
-      show-details: always
+      show-details: never
 
 jwt:
   secret: ${JWT_TOKEN_SECRET}

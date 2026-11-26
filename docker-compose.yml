@@ -4,14 +4,14 @@ services:
     container_name: iloveshop-postgres
     environment:
       POSTGRES_DB: iloveshop
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: 1234
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-1234}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ilja -d iloveshop"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d iloveshop"]
       interval: 5s
       timeout: 3s
       retries: 10
